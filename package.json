@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "start" : "npx tsc && node build/app.js",
+    "start": "npx tsc && node build/app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -12,11 +12,14 @@
   "description": "",
   "dependencies": {
     "express": "^4.21.2",
-    "nodemon": "^3.1.9"
+    "mysql2": "^3.12.0",
+    "nodemon": "^3.1.9",
+    "sequelize": "^6.37.5"
   },
   "devDependencies": {
     "@types/express": "^5.0.0",
     "@types/node": "^22.10.5",
+    "@types/sequelize": "^4.28.20",
     "typescript": "^5.7.2"
   }
 }
