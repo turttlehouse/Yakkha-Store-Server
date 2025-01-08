@@ -28,10 +28,10 @@ const db : any = {};
 db.Sequelize = Sequelize;
 db.sequelize = sequelize;
 
-//force : 1 /0 
+//force : use of  1 /0  instead of true/false is also valid.
 db.sequelize.sync({force : false})
 .then(()=>{
-    console.log('Database synchronized successfully : migration completed')
+    console.log('Migration completed : Database synchronized successfully')
 })
 
 export default db;
