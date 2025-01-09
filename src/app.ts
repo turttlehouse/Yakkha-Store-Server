@@ -13,11 +13,16 @@ import express,{Application,Request,Response} from 'express';
 const app:Application = express();
 const PORT:number = process.env.PORT ? parseInt(process.env.PORT) : 5000;
 import './database/connection';
+import userRoute from './routes/userRoute';
 
+app.use(express.json());
+
+app.use("",userRoute);
 
 app.get('/',(req:Request,res:Response)=>{
     res.send('server connected')
 })
+
 
 
 app.listen(PORT,()=>{
