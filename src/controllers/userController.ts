@@ -7,33 +7,47 @@ class AuthController{
 
     //RegisterUser Method
     public static async registerUser(req:Request,res:Response):Promise<void>{
-        const {username,email,password,role} = req.body;
+        // try {
+            const {username,email,password,role} = req.body;
 
-        if(!username || !email || !password){
-            res.status(400).json({message:"Please provide all fields"});
-            return;
-        }
-
-        const [user] = await User.findAll({
-            where :{
-                email : email
+            if(!username || !email || !password){
+                res.status(400).json({message:"Please provide all fields"});
+                return;
             }
-        })
 
-        if(user){
-            res.status(400).json({message:"User already exists"});
-            return;
-        }
+            if(role && !['admin','customer'].includes(role)){
+                res.status(400).json({message:"Invalid role"});
+                return;
+            }
 
-        await User.create({
-            username,
-            email,
-            role: role ? role : 'customer',
-            password: bcrypt.hashSync(password,8)
-        })
-        res.status(200).json({
-            message:"User registered successfully"
-        })
+            const [user] = await User.findAll({
+                where :{
+                    email : email
+                }
+            })
+
+            if(user){
+                res.status(400).json({message:"User already exists"});
+                return;
+            }
+
+            await User.create({
+                username,
+                email,
+                // role: role ? role : 'customer',
+                role: role,
+                password: bcrypt.hashSync(password,8)
+            })
+            res.status(200).json({
+                message:"User registered successfully"
+            })
+            
+        // }catch (error:any) {
+        //     res.status(500).json({
+        //         message : error.message
+        //     })
+            
+        // }
 
     }
 

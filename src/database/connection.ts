@@ -26,5 +26,8 @@ sequelize.sync({force : false})
 .then(()=>{
     console.log('Migration completed : Database synchronized successfully')
 })
+.catch((err)=>{
+    console.log('Migration Error : ',err)
+})
 
 export default sequelize
