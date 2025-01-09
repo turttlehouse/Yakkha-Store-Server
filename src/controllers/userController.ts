@@ -7,7 +7,7 @@ class AuthController{
 
     //RegisterUser Method
     public static async registerUser(req:Request,res:Response):Promise<void>{
-        const {username,email,password} = req.body;
+        const {username,email,password,role} = req.body;
 
         if(!username || !email || !password){
             res.status(400).json({message:"Please provide all fields"});
@@ -28,6 +28,7 @@ class AuthController{
         await User.create({
             username,
             email,
+            role: role ? role : 'customer',
             password: bcrypt.hashSync(password,8)
         })
         res.status(200).json({
