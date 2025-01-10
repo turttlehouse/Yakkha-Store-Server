@@ -34,4 +34,15 @@ app.get('/',(req:Request,res:Response)=>{
 
 app.listen(PORT,()=>{
     console.log(`Server is running on port ${PORT}`)
-})
+}).on('error', (err: any) => {
+    if (err.code === 'EADDRINUSE') {
+      console.error(`Port ${PORT} is in use. Trying a new port...`);
+      const fallbackPort = PORT + 1;
+      app.listen(fallbackPort, () => {
+        console.log(`Server is running on fallback port ${fallbackPort}`);
+      });
+    } else {
+      console.error(err);
+      process.exit(1); // Exit for other errors
+    }
+});
