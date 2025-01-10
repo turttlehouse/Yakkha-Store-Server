@@ -16,8 +16,10 @@ const app:Application = express();
 const PORT:number = process.env.PORT ? parseInt(process.env.PORT) : 5000;
 import './database/connection';
 import userRoute from './routes/userRoute';
+import adminSeeder from './adminSeeder';
 
 app.use(express.json());
+adminSeeder();
 
 app.use("",userRoute);
 
