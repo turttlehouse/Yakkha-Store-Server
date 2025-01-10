@@ -15,13 +15,16 @@ import express,{Application,Request,Response} from 'express';
 const app:Application = express();
 const PORT:number = process.env.PORT ? parseInt(process.env.PORT) : 5000;
 import './database/connection';
-import userRoute from './routes/userRoute';
 import adminSeeder from './adminSeeder';
+
+import userRoute from './routes/userRoute';
+import productRoute from './routes/productRoute';
 
 app.use(express.json());
 adminSeeder();
 
 app.use("",userRoute);
+app.use("/admin/product",productRoute);
 
 app.get('/',(req:Request,res:Response)=>{
     res.send('server connected')
@@ -31,4 +34,4 @@ app.get('/',(req:Request,res:Response)=>{
 
 app.listen(PORT,()=>{
     console.log(`Server is running on port ${PORT}`)
-});
+})
