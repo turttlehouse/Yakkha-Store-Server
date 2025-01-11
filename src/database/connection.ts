@@ -1,6 +1,7 @@
 import { Sequelize } from "sequelize-typescript";
 import User from "./models/userModel";
 import Product from "./models/productModel";
+import Category from "./models/categoryModel";
 
 const sequelize = new Sequelize({
     database : process.env.DB_NAME,
@@ -32,9 +33,16 @@ sequelize.sync({force : false})
     console.log('Migration Error : ',err)
 })
 
-//One to Many Relationship
-//User has many products
+//1:m relationship from perspective of User as User can have/create many products
 User.hasMany(Product,{foreignKey : 'userId'})
+
+//m:1 relationship from perspective of product as many products can belong to one user
 Product.belongsTo(User,{foreignKey : 'userId'})
+
+//m:1 relationship from perspective of product as many products can belong to one category
+Product.belongsTo(Category,{foreignKey : 'categoryId'})
+
+//1:m relationship from perspective of category as one category can have many products
+Category.hasMany(Product,{foreignKey : 'categoryId'})
 
 export default sequelize
