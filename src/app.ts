@@ -19,6 +19,7 @@ import adminSeeder from './adminSeeder';
 
 import userRoute from './routes/userRoute';
 import productRoute from './routes/productRoute';
+import categoryController from './controllers/categoryController';
 
 app.use(express.json());
 adminSeeder();
@@ -33,6 +34,7 @@ app.get('/',(req:Request,res:Response)=>{
 
 
 app.listen(PORT,()=>{
+    categoryController.seedCategory();
     console.log(`Server is running on port ${PORT}`)
 }).on('error', (err: any) => {
     if (err.code === 'EADDRINUSE') {
