@@ -1,9 +1,12 @@
 import { Request, Response } from 'express';
 import Product from '../database/models/productModel';
+import { AuthRequest } from '../middleware/authMiddleware';
 
 class ProductController{
-    async addProduct(req:Request, res:Response):Promise<void>{
+    async addProduct(req:AuthRequest, res:Response):Promise<void>{
 
+        const userId = req.user?.id;
+        
         const {productName,productPrice,productDescription,productStockQty} = req.body;
 
         let fileName;
@@ -26,7 +29,8 @@ class ProductController{
             productPrice,
             productDescription,
             productStockQty,
-            productImageUrl : fileName
+            productImageUrl : fileName,
+            userId : userId
         })
 
         res.status(200).json({
