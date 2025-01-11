@@ -7,7 +7,7 @@ class ProductController{
 
         const userId = req.user?.id;
         
-        const {productName,productPrice,productDescription,productStockQty} = req.body;
+        const {productName,productPrice,productDescription,productStockQty,categoryId} = req.body;
 
         let fileName;
 
@@ -17,7 +17,7 @@ class ProductController{
             fileName = './src/uploads/default.png'
         }
 
-        if(!productName || !productPrice || !productDescription || !productStockQty){
+        if(!productName || !productPrice || !productDescription || !productStockQty || !categoryId){
             res.status(400).json({
                 message : 'Please provide all the details'
             })
@@ -30,7 +30,8 @@ class ProductController{
             productDescription,
             productStockQty,
             productImageUrl : fileName,
-            userId : userId
+            userId : userId,
+            categoryId : categoryId
         })
 
         res.status(200).json({
