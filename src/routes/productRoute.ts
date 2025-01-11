@@ -17,6 +17,7 @@ upload.single('image'),productController.addProduct)
 //if : hello  is parameter then req.params.hello is used to get the value of hello
 router.route('/:id')
 .get(productController.getSingleProduct)
+.delete(authMiddleware.isAuthenticated,authMiddleware.restrictTo(Role.Admin),productController.deleteProduct)
 
 
 export default router

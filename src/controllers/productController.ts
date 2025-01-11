@@ -45,7 +45,7 @@ class ProductController{
     }
 
     async getAllProducts(req:Request,res:Response):Promise<void>{
-        const [data] = await Product.findAll({
+        const data = await Product.findAll({
             include : [
                 //join with user table
                 {
@@ -59,7 +59,7 @@ class ProductController{
                 }
             ]
         });
-        if(!data){
+        if(data.length === 0){
             res.status(404).json({
                 message : 'No products found'
             })
@@ -103,6 +103,36 @@ class ProductController{
         })
 
     }
+
+    async deleteProduct(req:AuthRequest,res:Response):Promise<void>{
+        const {id} = req.params;
+        const data = await Product.findAll({
+            where : {
+                id : id
+            }
+        })
+        if(data.length === 0){
+            res.status(404).json({
+                message : 'No product found'
+            })
+            return
+        }
+        // const userId = req.user?.id;
+        // const data = await Product.destroy({
+        //     where : {
+        //         id : id,
+        //         userId : userId
+        //     }
+        // })
+        await Product.destroy({
+            where : {
+                id : id,
+            }
+        })
+        res.status(200).json({
+            message : 'Product deleted successfully'
+        })
+    }    
 }
 
 export default new ProductController();
