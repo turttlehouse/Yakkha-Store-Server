@@ -3,6 +3,7 @@ import Product from '../database/models/productModel';
 import { AuthRequest } from '../middleware/authMiddleware';
 
 class ProductController{
+    
     async addProduct(req:AuthRequest, res:Response):Promise<void>{
 
         const userId = req.user?.id;
@@ -39,6 +40,20 @@ class ProductController{
         })
 
 
+    }
+
+    async getAllProducts(req:Request,res:Response):Promise<void>{
+        const [data] = await Product.findAll();
+        if(!data){
+            res.status(404).json({
+                message : 'No products found'
+            })
+            return
+        }
+        res.status(200).json({
+            message : "Products fetched successfully",
+            data : data
+        })
     }
 }
 
