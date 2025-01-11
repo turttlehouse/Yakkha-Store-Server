@@ -1,6 +1,8 @@
 import { Request, Response } from 'express';
 import Product from '../database/models/productModel';
 import { AuthRequest } from '../middleware/authMiddleware';
+import User from '../database/models/userModel';
+import Category from '../database/models/categoryModel';
 
 class ProductController{
     
@@ -8,7 +10,7 @@ class ProductController{
 
         const userId = req.user?.id;
         
-        const {productName,productPrice,productDescription,productStockQty,categoryId} = req.body;
+        const {productName,productPrice,productDescription,productTotalStockQty,categoryId} = req.body;
 
         let fileName;
 
@@ -18,7 +20,7 @@ class ProductController{
             fileName = './src/uploads/default.png'
         }
 
-        if(!productName || !productPrice || !productDescription || !productStockQty || !categoryId){
+        if(!productName || !productPrice || !productDescription || !productTotalStockQty || !categoryId){
             res.status(400).json({
                 message : 'Please provide all the details'
             })
@@ -29,7 +31,7 @@ class ProductController{
             productName,
             productPrice,
             productDescription,
-            productStockQty,
+            productTotalStockQty,
             productImageUrl : fileName,
             userId : userId,
             categoryId : categoryId
@@ -43,7 +45,20 @@ class ProductController{
     }
 
     async getAllProducts(req:Request,res:Response):Promise<void>{
-        const [data] = await Product.findAll();
+        const [data] = await Product.findAll({
+            include : [
+                //join with user table
+                {
+                    model : User,
+                    attributes : ['username','id','email']
+                },
+                //join with category table
+                {
+                    model : Category,
+                    attributes : ['categoryName']
+                }
+            ]
+        });
         if(!data){
             res.status(404).json({
                 message : 'No products found'
