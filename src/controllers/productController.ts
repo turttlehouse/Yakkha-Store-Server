@@ -77,7 +77,17 @@ class ProductController{
         const data = await Product.findAll({
             where : {
                 id : id
-            }
+            },
+            include : [
+                {
+                    model : User,
+                    attributes : ['username','id','email']
+                },
+                {
+                    model : Category,   
+                    attributes : ['categoryName']
+                }
+            ]
         })
         if(data.length === 0){
             res.status(404).json({
