@@ -70,6 +70,29 @@ class ProductController{
             data : data
         })
     }
+
+    async getSingleProduct(req:Request,res:Response): Promise<void>{
+
+        const id = req.params.id;
+        const data = await Product.findAll({
+            where : {
+                id : id
+            }
+        })
+        if(data.length === 0){
+            res.status(404).json({
+                message : 'No product found'
+            })
+            return
+        }
+        res.status(200).json({
+            message : 'Product fetched successfully',
+            //key-value pair same so we can write only data
+            //data : data
+            data 
+        })
+
+    }
 }
 
 export default new ProductController();
