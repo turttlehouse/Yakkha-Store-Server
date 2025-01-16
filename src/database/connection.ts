@@ -111,6 +111,10 @@ Order.belongsTo(Payment,{foreignKey : 'paymentId'})
 // Order.hasOne(Payment,{foreignKey : 'orderId'})
 // Payment.belongsTo(Order,{foreignKey : 'orderId'})
 
+//order-user relationship
+User.hasMany(Order,{foreignKey : 'userId'})
+Order.belongsTo(User,{foreignKey : 'userId'})
+
 
 
   
