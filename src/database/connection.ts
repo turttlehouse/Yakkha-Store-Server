@@ -3,6 +3,9 @@ import User from "./models/userModel";
 import Product from "./models/productModel";
 import Category from "./models/categoryModel";
 import Cart from "./models/cartModel";
+import Order from "./models/orderModel";
+import OrderDetail from "./models/orderDetailsModel";
+import Payment from "./models/paymentModel";
 
 const sequelize = new Sequelize({
     database : process.env.DB_NAME,
@@ -76,8 +79,42 @@ Cart.belongsTo(Product,{foreignKey : 'productId'})
 //     quantity: { type: Sequelize.INTEGER, defaultValue: 1 },
     // other fields as needed (e.g., price, total price, etc.)
 //   });    
+
+
+//order and OrderDetail relationship
+Order.hasMany(OrderDetail,{foreignKey : 'orderId'})
+OrderDetail.belongsTo(Order,{foreignKey : 'orderId'})
+
+//order details and product relationship
+Product.hasMany(OrderDetail,{foreignKey : 'productId'})
+OrderDetail.belongsTo(Product,{foreignKey : 'productId'})
+
+//order and payment relationship
+
+//One Payment can have one associated Order
+// (e.g., a customer makes a single payment for an order).
+//The Order table has a foreignKey (paymentId) that references the Payment table's primary key (id).
+
+//This is appropriate when each payment corresponds to one order, and the primary identifier 
+// is the Payment. For example, you want to track orders through payment IDs.
+Payment.hasOne(Order,{foreignKey : 'paymentId'})
+Order.belongsTo(Payment,{foreignKey : 'paymentId'})
+
+
+// most followed approach
+//One Order can have one associated Payment 
+// (e.g., a customer places an order and then makes a single payment for that order).
+
+//The Payment table has a foreignKey (orderId) that references the Order table's primary key (id).
+//This is suitable when each order will have exactly one corresponding payment and
+//  you want the Payment table to reference the Order table.
+// Order.hasOne(Payment,{foreignKey : 'orderId'})
+// Payment.belongsTo(Order,{foreignKey : 'orderId'})
+
+
+
   
 
-//exporting the sequelize instance
+//exporting the sequelize 
 
 export default sequelize
