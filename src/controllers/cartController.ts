@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import { AuthRequest } from '../middleware/authMiddleware';
 import Cart from '../database/models/cartModel';
 import Product from '../database/models/productModel';
+import Category from '../database/models/categoryModel';
 
 
 class CartController{
@@ -59,9 +60,17 @@ class CartController{
             },
             include :[
                 {
-                    model : Product
+                    model : Product,
+                    attributes : ['productName','productDescription','productImageUrl'],
+                    include : [
+                        {
+                            model : Category,
+                            attributes : ['id','categoryName']
+                        }
+                    ]
                 }
-            ]
+            ],
+            attributes : ['productId','quantity']
         })
 
         if(cartItems.length === 0){
@@ -75,6 +84,66 @@ class CartController{
             message : "Cart Items Fetched Successfully",
             data : cartItems
         })
+
+    }
+
+    async deleteMyCartItem(req:AuthRequest,res:Response):Promise<void>{
+        const userId = req.user?.id;
+        const {productId} = req.params;
+
+        const product = await Product.findByPk(productId);
+        if(!product){
+            res.status(404).json({
+                message : 'Product not found in the cart'
+            })
+            return
+        }
+
+        await Cart.destroy({
+            where : {
+                userId : userId,
+                productId : productId 
+            }
+        })
+
+        res.status(200).json({
+            message : 'Cart items deleted successfully'
+        })
+    }
+
+    async updateCartItem(req:AuthRequest,res:Response):Promise<void>{
+        const userId = req.user?.id;
+        const {productId} = req.params;
+        const {quantity} = req.body;
+        if(!quantity){
+            res.status(400).json({
+                message : 'Please provide quantity'
+            })
+            return
+        }
+
+        const cartData : Cart | null = await Cart.findOne({
+            where :{
+                userId,
+                productId
+            }
+        })
+
+        if(!cartData){
+            res.status(404).json({
+                message : 'Product not found in the cart'
+            })
+            return
+        }
+
+        cartData.quantity = quantity;
+        await cartData?.save();
+
+        res.status(200).json({
+            message : "Cart item updated successfully",
+            data : cartData
+        })
+
 
     }
 }
