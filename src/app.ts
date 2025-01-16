@@ -22,6 +22,7 @@ import productRoute from './routes/productRoute';
 import categoryController from './controllers/categoryController';
 import categoryRoute from './routes/categoryRoute';
 import cartRoute from './routes/cartRoute';
+import orderRoute from './routes/orderRoute';
 
 app.use(express.json());
 adminSeeder();
@@ -29,7 +30,8 @@ adminSeeder();
 app.use("",userRoute);
 app.use("/admin/product",productRoute);
 app.use("/admin/category",categoryRoute);
-app.use("/customer/cart",cartRoute)
+app.use("/customer/cart",cartRoute);
+app.use("/customer/order",orderRoute);
 
 app.get('/',(req:Request,res:Response)=>{
     res.send('server connected')
