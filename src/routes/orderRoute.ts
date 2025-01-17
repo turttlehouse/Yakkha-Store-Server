@@ -17,4 +17,7 @@ router.route('/verify')
 router.route('/customer')
 .post(authMiddleware.isAuthenticated,errorHandler(orderController.fetchMyOrders))
 
+router.route('/:id')
+.get(authMiddleware.isAuthenticated,errorHandler(orderController.fetchOrderDetails))
+
 export default router

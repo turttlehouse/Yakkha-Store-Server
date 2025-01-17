@@ -5,6 +5,7 @@ import { AuthRequest } from "../middleware/authMiddleware";
 import { Response } from "express";
 import { KhaltiResponse, PaymentMethod, PaymentStatus, TransactionStatus, TransactionVerificationResponse } from "../types/orderTypes";
 import axios from 'axios';
+import Product from "../database/models/productModel";
 
 
 class OrderController{
@@ -167,6 +168,41 @@ class OrderController{
             })
         }
 
+    }
+
+    async fetchOrderDetails(req:AuthRequest, res :Response):Promise<void>{
+        // const userId = req.user?.id;
+        const orderId = req.params?.id;
+        if(!orderId){
+            res.status(400).json({
+                message : 'please provide orderId'
+            })
+            return
+        }
+
+        const orderDetails = await OrderDetail.findAll({
+            where : {
+                orderId : orderId,
+            },
+            include :[
+                {
+
+                    model : Product
+                }
+            ]
+        })
+
+        if(orderDetails.length === 0){
+            res.status(200).json({
+                message : "No order found",
+                data : []
+            })
+            return
+        }
+        res.status(200).json({
+            message : "Order details fetched successfully",
+            data : orderDetails
+        })
     }
 
 }
