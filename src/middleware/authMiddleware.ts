@@ -22,7 +22,7 @@ class AuthMiddleware{
     async isAuthenticated(req:AuthRequest,res:Response,next:NextFunction):Promise<void>{
         // const token = Array.isArray(req.headers.authorization) ? req.headers.authorization[0] : req.headers.authorization;
         const token = req.headers.authorization
-        console.log(token);
+        // console.log(token);
        
         if(!token || token === null || token === undefined){
             res.status(403).json({

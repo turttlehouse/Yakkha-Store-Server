@@ -3,7 +3,7 @@ import Order from "../database/models/orderModel";
 import Payment from "../database/models/paymentModel";
 import { AuthRequest } from "../middleware/authMiddleware";
 import { Response } from "express";
-import { KhaltiResponse, PaymentMethod, PaymentStatus, TransactionStatus, TransactionVerificationResponse } from "../types/orderTypes";
+import { KhaltiResponse, OrderStatus, PaymentMethod, PaymentStatus, TransactionStatus, TransactionVerificationResponse } from "../types/orderTypes";
 import axios from 'axios';
 import Product from "../database/models/productModel";
 
@@ -202,6 +202,47 @@ class OrderController{
         res.status(200).json({
             message : "Order details fetched successfully",
             data : orderDetails
+        })
+    }
+
+    async cancelOrder(req:AuthRequest,res:Response) : Promise<void>{
+        const userId = req.user?.id;
+        const orderId = req.params?.id;
+        if(!orderId){
+            res.status(400).json({
+                message : 'please provide orderId'
+            })
+            return
+        }
+
+        //in real world scenario also it can only single object
+        const orders:any[] = await Order.findAll({
+            where :{
+                userId : userId,
+                id : orderId
+            }   
+        })
+        // console.log(orders);
+        if(orders.length > 0)
+        {
+            const order = orders[0]
+            if(order?.orderStatus === OrderStatus.Ontheway || order?.orderStatus === OrderStatus.Delivered || order?.orderStatus === OrderStatus.Preparation){
+                res.status(400).json({
+                    message : "Order cannot be cancelled if it is on the way or delivered or in preparation"
+                })
+                return
+            }
+
+        }
+
+        await Order.update({orderStatus : OrderStatus.Cancelled},{
+            where :{
+                userId : userId,
+                id : orderId
+            }
+        })
+        res.status(200).json({
+            message : 'Order cancelled successfully'
         })
     }
 

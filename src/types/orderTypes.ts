@@ -66,3 +66,11 @@ export enum TransactionStatus{
     Refunded = 'Refunded',
     Initiated = 'Initiated'
 }
+
+export enum OrderStatus{
+    Pending = 'pending',
+    Preparation = 'preparation',
+    Delivered = 'delivered',
+    Cancelled = 'cancelled',
+    Ontheway = 'ontheway'
+}

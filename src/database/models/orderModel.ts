@@ -51,7 +51,7 @@ class Order extends Model{
     declare totalAmount : Number;
 
     @Column({
-        type : DataType.ENUM('pending','completed','cancelled','delivered','on the way','preparation'),
+        type : DataType.ENUM('pending','completed','cancelled','delivered','ontheway','preparation'),
         defaultValue : 'pending'
     })
 
