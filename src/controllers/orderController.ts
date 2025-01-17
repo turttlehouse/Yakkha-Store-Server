@@ -3,7 +3,7 @@ import Order from "../database/models/orderModel";
 import Payment from "../database/models/paymentModel";
 import { AuthRequest } from "../middleware/authMiddleware";
 import { Response } from "express";
-import { KhaltiResponse, PaymentMethod } from "../types/orderTypes";
+import { KhaltiResponse, PaymentMethod, PaymentStatus, TransactionStatus, TransactionVerificationResponse } from "../types/orderTypes";
 import axios from 'axios';
 
 
@@ -46,10 +46,10 @@ class OrderController{
             //khalti lai kei data pathauna parne hunxa
             const data = {
                 //payment success vayepaxi kun url ma redirect garne
-                return_url : "http://localhost:50001/success",
+                return_url : "http://localhost:5173/success",
                 //khalti will accept in paisa only but we are taking in rupees so multiply by 100
                 amount : totalAmount * 100,
-                website_url : "http://localhost:5000",
+                website_url : "http://localhost:5173",
                 purchase_order_id : orderData.id,
                 purchase_order_name :  'orderName_' + orderData.id,
             }
@@ -86,6 +86,52 @@ class OrderController{
         else{
             res.status(200).json({
                 message : "Order created successfully"
+            })
+        }
+
+    }
+
+    async verifyTransaction(req:AuthRequest,res:Response){
+        const {pidx} = req.body;
+        if(!pidx){
+            return res.status(400).json({
+                message : 'please provide pidx'
+            })
+        }
+        const userId = req.user?.id;
+
+        const response = await axios.post('https://dev.khalti.com/api/v2/epayment/lookup/',{pidx},{
+            headers :{
+                'Authorization' : 'key 35a596375349476ab4715f92d20f0e02'
+            }
+        })
+
+        const data : TransactionVerificationResponse = response?.data as TransactionVerificationResponse;
+        // console.log(data)
+        if(data.status === TransactionStatus.Completed){
+            // let order = await Order.findAll({
+            //     where :{
+            //         userId : userId
+            //     },
+            //     include : [
+            //         {
+            //             model : Payment
+            //         }
+            //     ]
+            // })
+            const paymentresponse = await Payment.update({paymentStatus : PaymentStatus.Paid},{
+                where :{
+                    pidx : pidx
+                }
+            })
+
+            res.status(200).json({
+                message : "Payment Verified Successfully"
+            })
+        }
+        else{
+            res.status(200).json({
+                message : "Payment not verified"
             })
         }
 

@@ -10,5 +10,8 @@ const router : Router = express.Router();
 router.route('/')
 .post(authMiddleware.isAuthenticated,errorHandler(orderController.createOrder))
 
+router.route('/verify')
+.post(authMiddleware.isAuthenticated,errorHandler(orderController.verifyTransaction))
+
 
 export default router

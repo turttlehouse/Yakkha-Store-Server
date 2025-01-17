@@ -40,3 +40,29 @@ export interface KhaltiResponse{
     expires_in : number,
     // user_fee : number
 }
+
+//After the payment is done, khalti will return the response.data  in the following format
+// {
+//     "pidx": "HT6o6PEZRWFJ5ygavzHWd5",
+//     "total_amount": 1000,
+//     "status": "Completed",
+//     "transaction_id": "GFq9PFS7b2iYvL8Lir9oXe",
+//     "fee": 0,
+//     "refunded": false
+//  }
+
+export interface TransactionVerificationResponse{
+    pidx : string,
+    total_amount : number,
+    status : TransactionStatus,
+    transaction_id : string,
+    fee : number,
+    refunded : boolean
+}
+
+export enum TransactionStatus{
+    Completed = 'Completed',
+    Pending = 'Pending',
+    Refunded = 'Refunded',
+    Initiated = 'Initiated'
+}
