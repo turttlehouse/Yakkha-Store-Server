@@ -9,14 +9,15 @@ import axios from 'axios';
 
 class OrderController{
 
-    async createOrder(req:AuthRequest,res:Response){
+    async createOrder(req:AuthRequest,res:Response):Promise<void>{
         const userId = req.user?.id;
         const {phoneNumber,shippingAddress,totalAmount,items,paymentDetails} = req.body;
 
         if(!phoneNumber || !shippingAddress || !totalAmount || !items || !paymentDetails || !paymentDetails.paymentMethod ||  items.length === 0){
-            return res.status(400).json({
+            res.status(400).json({
                 message : 'please provide phoneNumber,shippingAddress,totalAmount,items and paymentDetails'
             })
+            return
         }
 
         const paymentData = await Payment.create({
@@ -91,14 +92,15 @@ class OrderController{
 
     }
 
-    async verifyTransaction(req:AuthRequest,res:Response){
+    async verifyTransaction(req:AuthRequest,res:Response):Promise<void>{
         const {pidx} = req.body;
         if(!pidx){
-            return res.status(400).json({
+            res.status(400).json({
                 message : 'please provide pidx'
             })
+            return
         }
-        const userId = req.user?.id;
+        // const userId = req.user?.id;
 
         const response = await axios.post('https://dev.khalti.com/api/v2/epayment/lookup/',{pidx},{
             headers :{
@@ -119,7 +121,7 @@ class OrderController{
             //         }
             //     ]
             // })
-            const paymentresponse = await Payment.update({paymentStatus : PaymentStatus.Paid},{
+            await Payment.update({paymentStatus : PaymentStatus.Paid},{
                 where :{
                     pidx : pidx
                 }
@@ -132,6 +134,36 @@ class OrderController{
         else{
             res.status(200).json({
                 message : "Payment not verified"
+            })
+        }
+
+    }
+
+    async  fetchMyOrders(req:AuthRequest,res:Response):Promise<void>{
+        const userId = req.user?.id
+        const orders = await Order.findAll({
+            where :{
+                userId : userId
+            },
+            include :[
+                {
+                    model : Payment
+                }
+            ]
+        })
+
+        if(orders.length > 0)
+        {
+            res.status(200).json({
+                message : "Orders fetched successfully",
+                data : orders
+            })
+            return
+        }
+        else{
+            res.status(200).json({
+                message : "No orders found",
+                data : []
             })
         }
 
