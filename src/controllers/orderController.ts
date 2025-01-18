@@ -2,7 +2,7 @@ import OrderDetail from "../database/models/orderDetailsModel";
 import Order from "../database/models/orderModel";
 import Payment from "../database/models/paymentModel";
 import { AuthRequest } from "../middleware/authMiddleware";
-import { Response } from "express";
+import { Response,Request } from "express";
 import { KhaltiResponse, OrderStatus, PaymentMethod, PaymentStatus, TransactionStatus, TransactionVerificationResponse } from "../types/orderTypes";
 import axios from 'axios';
 import Product from "../database/models/productModel";
@@ -244,6 +244,28 @@ class OrderController{
         res.status(200).json({
             message : 'Order cancelled successfully'
         })
+    }
+
+    async changeOrderStatus(req:Request, res : Response) :Promise<void>{
+        const orderId = req.params?.id;
+        const {orderStatus} = req.body;
+        if(!orderId || !orderStatus){
+            res.status(400).json({
+                message : 'please provide orderId and orderStatus'
+            })
+            return
+        }
+
+        await Order.update({orderStatus : orderStatus},{
+            where : {
+                id : orderId
+            }
+        })
+
+        res.status(200).json({
+            message : 'Order status updated successfully' 
+        })
+
     }
 
 }

@@ -15,10 +15,13 @@ router.route('/verify')
 
 
 router.route('/customer')
-.post(authMiddleware.isAuthenticated,errorHandler(orderController.fetchMyOrders))
+.get(authMiddleware.isAuthenticated,errorHandler(orderController.fetchMyOrders))
 
 router.route('/customer/:id')
 .get(authMiddleware.isAuthenticated,errorHandler(orderController.fetchOrderDetails))
 .patch(authMiddleware.isAuthenticated,authMiddleware.restrictTo(Role.Customer),errorHandler(orderController.cancelOrder))
+
+router.route('/admin/:id')
+.patch(authMiddleware.isAuthenticated,authMiddleware.restrictTo(Role.Admin),errorHandler(orderController.changeOrderStatus))
 
 export default router
