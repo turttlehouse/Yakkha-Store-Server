@@ -7,6 +7,10 @@ import { KhaltiResponse, OrderStatus, PaymentMethod, PaymentStatus, TransactionS
 import axios from 'axios';
 import Product from "../database/models/productModel";
 
+//order class model ma payment id xaina 
+class ExtendedOrder extends Order{
+    declare paymentId : string | null
+}
 
 class OrderController{
 
@@ -264,6 +268,37 @@ class OrderController{
 
         res.status(200).json({
             message : 'Order status updated successfully' 
+        })
+
+    }
+
+    async changePaymentStatus(req:Request,res:Response):Promise<void>{
+        const orderId = req.params?.id;
+        const {paymentStatus} = req.body;
+
+        const order = await Order.findByPk(orderId);
+        if(!order){
+            res.status(400).json({
+                message : 'Order not found'
+            })
+            return
+        }
+        const extendedOrder : ExtendedOrder = order as ExtendedOrder;
+        if(!extendedOrder.paymentId){
+            res.status(400).json({
+                message : 'Payment not done'
+            })
+            return
+        }
+
+        await Payment.update({paymentStatus:paymentStatus},{
+            where : {
+                id : extendedOrder.paymentId
+            }
+        })
+
+        res.status(200).json({
+            message : `Payment status of orderId ${orderId} updated successfully to ${paymentStatus}`
         })
 
     }

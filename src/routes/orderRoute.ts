@@ -21,6 +21,9 @@ router.route('/customer/:id')
 .get(authMiddleware.isAuthenticated,errorHandler(orderController.fetchOrderDetails))
 .patch(authMiddleware.isAuthenticated,authMiddleware.restrictTo(Role.Customer),errorHandler(orderController.cancelOrder))
 
+router.route('/admin/payment/:id')
+.patch(authMiddleware.isAuthenticated,authMiddleware.restrictTo(Role.Admin),errorHandler(orderController.changePaymentStatus))
+
 router.route('/admin/:id')
 .patch(authMiddleware.isAuthenticated,authMiddleware.restrictTo(Role.Admin),errorHandler(orderController.changeOrderStatus))
 
