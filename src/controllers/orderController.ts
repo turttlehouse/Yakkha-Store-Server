@@ -303,6 +303,50 @@ class OrderController{
 
     }
 
+    async deleteOrder(req:Request,res:Response):Promise<void>{
+        const orderId = req.params?.id;
+        if(!orderId){
+            res.status(400).json({
+                message : 'please provide orderId'
+            })
+            return
+        }
+        const order = await Order.findByPk(orderId);
+        const extendedOrder : ExtendedOrder = order as ExtendedOrder;
+
+        // Note :The general rule is that you should delete the child records 
+        // (i.e., the payment table and OrderDetail table) before the parent record (i.e., the Order table) because
+
+        // Foreign Key Constraints: If the OrderDetail table has a foreign key constraint that references the Order table, the database might not allow deletion of the Order record if related records still exist in the OrderDetail table. Attempting to delete the parent record before the child records would lead to an error.
+
+        // Referential Integrity: Deleting the OrderDetail records first ensures that there are no references to the Order left behind. This makes it easier to delete the Order record afterwards without leaving any broken relationships in the database.
+
+        // Deleting the payment record first, using the paymentId from the order
+        await Payment.destroy({
+            where :{
+                id : extendedOrder.paymentId
+            }
+        })
+        // Deleting the order details first to ensure no foreign key constraint is violated
+        await OrderDetail.destroy({
+            where : {
+                orderId : orderId
+            }
+        })
+
+        // Now deleting the order
+        await Order.destroy({
+            where : {
+                id : orderId
+            }
+        })
+
+       
+        res.status(200).json({
+            message : 'Order deleted successfully'
+        })
+    }
+
 }
 
 export default new OrderController();
