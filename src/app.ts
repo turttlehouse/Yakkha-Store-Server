@@ -23,6 +23,12 @@ import categoryController from './controllers/categoryController';
 import categoryRoute from './routes/categoryRoute';
 import cartRoute from './routes/cartRoute';
 import orderRoute from './routes/orderRoute';
+import cors from 'cors';
+
+app.use(cors({
+    origin: '*',
+    methods: ['GET','POST','PATCH','PUT','DELETE']
+}))
 
 app.use(express.json());
 adminSeeder();
