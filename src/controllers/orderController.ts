@@ -48,23 +48,29 @@ class OrderController{
         }
 
         if(paymentDetails.paymentMethod === PaymentMethod.Khalti){
+
+            const BASE_URL = process.env.KHALTI_API_BASE_URL;
+            const API_KEY = process.env.KHALTI_API_KEY;
+            const SUCCESS_URL = process.env.APP_SUCCESS_URL;
+            const WEBSITE_URL = process.env.APP_WEBSITE_URL;
+
             //khalti payment logic
             //khalti lai kei data pathauna parne hunxa
             const data = {
                 //payment success vayepaxi kun url ma redirect garne
-                return_url : "http://localhost:5173/success",
+                return_url : SUCCESS_URL,
                 //khalti will accept in paisa only but we are taking in rupees so multiply by 100
                 amount : totalAmount * 100,
-                website_url : "http://localhost:5173",
+                website_url :  WEBSITE_URL,
                 purchase_order_id : orderData.id,
                 purchase_order_name :  'orderName_' + orderData.id,
             }
 
             //khalti le deko endpoint ma hit hanne
             //ko manxe le request gareko tesko header ni chaiyo
-            const response = await axios.post('https://dev.khalti.com/api/v2/epayment/initiate/',data,{
+            const response = await axios.post(`${BASE_URL}/epayment/initiate/`,data,{
                 headers :{
-                    'Authorization' : 'key 35a596375349476ab4715f92d20f0e02'
+                    'Authorization' : `key ${API_KEY}`
                 }
             })
 
@@ -106,10 +112,12 @@ class OrderController{
             return
         }
         // const userId = req.user?.id;
+        const BASE_URL = process.env.KHALTI_API_BASE_URL
+        const API_KEY = process.env.KHALTI_API_KEY;
 
-        const response = await axios.post('https://dev.khalti.com/api/v2/epayment/lookup/',{pidx},{
+        const response = await axios.post(`${BASE_URL}/epayment/lookup/`,{pidx},{
             headers :{
-                'Authorization' : 'key 35a596375349476ab4715f92d20f0e02'
+                'Authorization' : `key ${API_KEY}`
             }
         })
 
