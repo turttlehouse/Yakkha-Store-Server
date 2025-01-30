@@ -73,7 +73,7 @@ class CartController{
             include :[
                 {
                     model : Product,
-                    attributes : ['productName','productDescription','productImageUrl'],
+                    // attributes : ['productName','productDescription','productImageUrl'],
                     include : [
                         {
                             model : Category,
