@@ -44,9 +44,21 @@ class CartController{
                 quantity : quantity
             })
         }
+        const data = await Cart.findAll({
+            where :{
+                userId
+            }
+        })
+
+        // const product = await Product.findByPk(productId)
         res.status(200).json({
             message : 'Product added to cart successfully',
-            data : cartItem
+            data : data
+            // data : {
+            //     spread garda orm le meta data ni return garirahunxa so json ma conversion
+            //     ...cartItem.toJSON(),
+            //     product : product?.toJSON()
+            // }
         })
     }
 
