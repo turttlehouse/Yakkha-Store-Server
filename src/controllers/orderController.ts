@@ -6,6 +6,7 @@ import { Response,Request } from "express";
 import { KhaltiResponse, OrderStatus, PaymentMethod, PaymentStatus, TransactionStatus, TransactionVerificationResponse } from "../types/orderTypes";
 import axios from 'axios';
 import Product from "../database/models/productModel";
+import Cart from "../database/models/cartModel";
 
 //order class model ma payment id xaina 
 class ExtendedOrder extends Order{
@@ -37,13 +38,19 @@ class OrderController{
             paymentId : paymentData.id  
         })
 
-        
+        let responseOrderData;
 
         for(var i=0; i<items.length;i++){
-            await OrderDetail.create({
+            responseOrderData = await OrderDetail.create({
                 orderId : orderData.id,
                 productId : items[i].productId,
                 quantity : items[i].quantity
+            })
+            await Cart.destroy({
+                where : {
+                    userId : userId,
+                    productId : items[i].productId
+                }
             })
         }
 
@@ -91,13 +98,15 @@ class OrderController{
 
             res.status(200).json({
                 message : "Order created successfully",
-                url : khaltiResponse.payment_url
+                url : khaltiResponse.payment_url,
+                data : responseOrderData
             })
 
         }
         else{
             res.status(200).json({
-                message : "Order created successfully"
+                message : "Order created successfully",
+                data : responseOrderData
             })
         }
 
