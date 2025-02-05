@@ -7,6 +7,8 @@ import { KhaltiResponse, OrderStatus, PaymentMethod, PaymentStatus, TransactionS
 import axios from 'axios';
 import Product from "../database/models/productModel";
 import Cart from "../database/models/cartModel";
+import User from "../database/models/userModel";
+import Category from "../database/models/categoryModel";
 
 //order class model ma payment id xaina 
 class ExtendedOrder extends Order{
@@ -208,7 +210,25 @@ class OrderController{
             include :[
                 {
 
-                    model : Product
+                    model : Product,
+                    include : [
+                        {
+                            model : Category,
+                            attributes : [ "categoryName"]
+                        }
+                    ]
+                },{
+                    model : Order,
+                    include : [{
+                        model : Payment,
+                        attributes : ['paymentMethod','paymentStatus']
+                    },
+                    {
+                        model : User,
+                        attributes : [ "username","email"]
+                    }
+                
+                ],
                 }
             ]
         })
