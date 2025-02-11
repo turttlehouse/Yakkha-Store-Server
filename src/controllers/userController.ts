@@ -2,6 +2,7 @@ import {Request,Response} from 'express';
 import User from '../database/models/userModel';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
+import { AuthRequest } from '../middleware/authMiddleware';
 
 class AuthController{
 
@@ -94,6 +95,27 @@ class AuthController{
         })
               
     }
+
+    public static async  fetchusers(req:AuthRequest,res:Response):Promise<void>{
+        const users = await User.findAll()
+
+        if(users.length > 0)
+        {
+            res.status(200).json({
+                message : "users fetched successfully",
+                data : users
+            })
+            return
+        }
+        else{
+            res.status(200).json({
+                message : "No users found",
+                data : []
+            })
+        }
+
+    }
+
 }
 
 export default AuthController

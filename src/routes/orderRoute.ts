@@ -9,6 +9,7 @@ const router : Router = express.Router();
 
 router.route('/')
 .post(authMiddleware.isAuthenticated,errorHandler(orderController.createOrder))
+.get(authMiddleware.isAuthenticated,authMiddleware.restrictTo(Role.Admin),orderController.fetchOrders)
 
 router.route('/verify')
 .post(authMiddleware.isAuthenticated,errorHandler(orderController.verifyTransaction))
