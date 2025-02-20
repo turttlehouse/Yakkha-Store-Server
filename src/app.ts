@@ -33,6 +33,9 @@ app.use(cors({
 app.use(express.json());
 adminSeeder();
 
+//make the uploads folder public
+app.use(express.static("./src/uploads/"))
+
 app.use("",userRoute);
 app.use("/admin/product",productRoute);
 app.use("/admin/category",categoryRoute);
