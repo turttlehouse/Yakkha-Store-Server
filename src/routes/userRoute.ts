@@ -15,7 +15,8 @@ router.route('/login')
 router.route('/users')
 .get(authMiddleware.isAuthenticated,authMiddleware.restrictTo(Role.Admin),errorHandler(AuthController.fetchusers))
 
-
+router.route('/users/:id')
+.delete(authMiddleware.isAuthenticated,authMiddleware.restrictTo(Role.Admin),errorHandler(AuthController.deleteUser))
 
 
 export default router

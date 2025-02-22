@@ -116,6 +116,43 @@ class AuthController{
 
     }
 
+    public static async deleteUser(req:AuthRequest,res:Response):Promise<void>{
+        const id = req.params.id;
+
+        const user = await User.findOne({
+            where:{
+                id : id
+            }
+        })
+
+        if(!user){
+            res.status(400).json({
+                message : "User not found"
+            })
+            return;
+        }
+
+        // console.log(user)
+        // return;
+
+        if(user.role === 'admin'){
+            res.status(400).json({
+                message : "You cannot delete an admin"
+            })
+            return;
+        }
+
+        await User.destroy({
+            where : {
+                id : id
+            }
+        })
+
+        res.status(200).json({
+            message : "User deleted successfully"
+        })
+    }
+
 }
 
 export default AuthController
