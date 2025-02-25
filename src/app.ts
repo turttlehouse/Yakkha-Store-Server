@@ -24,6 +24,7 @@ import categoryRoute from './routes/categoryRoute';
 import cartRoute from './routes/cartRoute';
 import orderRoute from './routes/orderRoute';
 import cors from 'cors';
+import {Server} from 'socket.io';
 
 app.use(cors({
     origin: '*',
@@ -48,18 +49,36 @@ app.get('/',(req:Request,res:Response)=>{
 
 
 
-app.listen(PORT,()=>{
+// app.listen(PORT,()=>{
+//     categoryController.seedCategory();
+//     console.log(`Server is running on port ${PORT}`)
+// }).on('error', (err: any) => {
+//     if (err.code === 'EADDRINUSE') {
+//       console.error(`Port ${PORT} is in use. Trying a new port...`);
+//       const fallbackPort = PORT + 1;
+//       app.listen(fallbackPort, () => {
+//         console.log(`Server is running on fallback port ${fallbackPort}`);
+//       });
+//     } else {
+//       console.error(err);
+//       process.exit(1); // Exit for other errors
+//     }
+// });
+const server = app.listen(PORT,()=>{
     categoryController.seedCategory();
     console.log(`Server is running on port ${PORT}`)
-}).on('error', (err: any) => {
-    if (err.code === 'EADDRINUSE') {
-      console.error(`Port ${PORT} is in use. Trying a new port...`);
-      const fallbackPort = PORT + 1;
-      app.listen(fallbackPort, () => {
-        console.log(`Server is running on fallback port ${fallbackPort}`);
-      });
-    } else {
-      console.error(err);
-      process.exit(1); // Exit for other errors
-    }
-});
+})
+
+const io = new Server(server,{
+  cors :{
+    origin : '*'
+  }
+})
+
+io.on('connection',(socket)=>{
+    console.log('a user connected');
+
+    socket.on('disconnect',()=>{
+        console.log('user disconnected');
+    })
+})
