@@ -174,6 +174,8 @@ io.on('connection',async(socket)=>{
 
     socket.on('disconnect',()=>{
         console.log('user disconnected');
+        // Remove the disconnected user from onlineUsers
+        onlineUsers = onlineUsers.filter(user => user.socketId !== socket.id);
     })
     // [
     //   {
