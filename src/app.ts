@@ -24,7 +24,11 @@ import categoryRoute from './routes/categoryRoute';
 import cartRoute from './routes/cartRoute';
 import orderRoute from './routes/orderRoute';
 import cors from 'cors';
+
 import {Server} from 'socket.io';
+import { promisify } from 'util';
+import jwt from 'jsonwebtoken';
+import User from './database/models/userModel';
 
 app.use(cors({
     origin: '*',
@@ -64,6 +68,7 @@ app.get('/',(req:Request,res:Response)=>{
 //       process.exit(1); // Exit for other errors
 //     }
 // });
+
 const server = app.listen(PORT,()=>{
     categoryController.seedCategory();
     console.log(`Server is running on port ${PORT}`)
@@ -75,10 +80,107 @@ const io = new Server(server,{
   }
 })
 
-io.on('connection',(socket)=>{
+let onlineUsers : any[] = []
+
+const addToOnlineUsers = (socketId : string,userId : string,role : string)=>{
+  onlineUsers = onlineUsers?.filter((user : any)=>user.userId !== userId)
+  onlineUsers.push({socketId,userId,role})
+
+}
+
+io.on('connection',async(socket)=>{
     console.log('a user connected');
+    if(socket.handshake && socket.handshake.auth){
+    //@ts-ignore
+    const {token} = socket.handshake.auth
+    
+    if(token){
+      try {
+        // @ts-ignore
+      const decoded = await promisify(jwt.verify)(token,process.env.JWT_SECRET_KEY)
+
+      // {
+      //   id: '6bacdcb8-6a22-4acb-81bd-c3a6c1b504d4',
+      //   iat: 1740568188,
+      //   exp: 1744024188
+      // }
+      // console.log(decoded)
+      if(decoded){
+        // @ts-ignore
+        const doesUserExists = await User.findByPk(decoded.id)
+        // console.log(doesUserExists)
+        // {
+        //   dataValues: {
+        //     id: '6bacdcb8-6a22-4acb-81bd-c3a6c1b504d4',
+        //     username: 'sabin',
+        //     role: 'customer',
+        //     email: 'sabin@gmail.com',
+        //     password: '$2b$08$Rj03f88UXpRjySPICuZlReLqMhmOFQyqrS5EjjcTD.gB372DY2pUG',
+        //     createdAt: 2025-02-24T02:55:39.000Z,
+        //     updatedAt: 2025-02-24T02:55:39.000Z
+        //   },
+        //   _previousDataValues: {
+        //     id: '6bacdcb8-6a22-4acb-81bd-c3a6c1b504d4',
+        //     username: 'sabin',
+        //     role: 'customer',
+        //     email: 'sabin@gmail.com',
+        //     password: '$2b$08$Rj03f88UXpRjySPICuZlReLqMhmOFQyqrS5EjjcTD.gB372DY2pUG',
+        //     createdAt: 2025-02-24T02:55:39.000Z,
+        //     updatedAt: 2025-02-24T02:55:39.000Z
+        //   },
+        //   uniqno: 1,
+        //   _changed: Set(0) {},
+        //   _options: {
+        //     isNewRecord: false,
+        //     _schema: null,
+        //     _schemaDelimiter: '',
+        //     raw: true,
+        //     attributes: [
+        //       'id',
+        //       'username',
+        //       'role',
+        //       'email',
+        //       'password',
+        //       'createdAt',
+        //       'updatedAt'
+        //     ]
+        //   },
+        //   isNewRecord: false
+        // }
+        if(doesUserExists){
+          addToOnlineUsers(socket.id,doesUserExists.id,doesUserExists.role)
+        }
+      }
+        
+      } catch (error) {
+        console.log('error','Invalid token')
+        
+      }
+      
+
+    }
+  }else{
+    console.log('no token found')
+  }
+
+    //
+    socket.on('updatedOrderStatus',({status,orderId,userId})=>{
+      const findUser = onlineUsers.find((user : any)=>user.userId === userId)
+      if(findUser){
+        io.to(findUser.socketId).emit("statusUpdated",{status,orderId})
+      }
+    })
+
 
     socket.on('disconnect',()=>{
         console.log('user disconnected');
     })
+    // [
+    //   {
+    //     socketId: 'VlAUMrEa34Ne3SB0AAAB',
+    //     userId: '6bacdcb8-6a22-4acb-81bd-c3a6c1b504d4',
+    //     role: 'customer'
+    //   }
+    // ]
+    // console.log(onlineUsers);
 })
