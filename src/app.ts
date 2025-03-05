@@ -89,7 +89,7 @@ const addToOnlineUsers = (socketId : string,userId : string,role : string)=>{
 }
 
 io.on('connection',async(socket)=>{
-    console.log('a user connected');
+    console.log('a user connected with ',socket.id);
     if(socket.handshake && socket.handshake.auth){
     //@ts-ignore
     const {token} = socket.handshake.auth
@@ -167,7 +167,17 @@ io.on('connection',async(socket)=>{
     socket.on('updatedOrderStatus',({status,orderId,userId})=>{
       const findUser = onlineUsers.find((user : any)=>user.userId === userId)
       if(findUser){
+        // console.log('orderTrigger')
         io.to(findUser.socketId).emit("statusUpdated",{status,orderId})
+      }
+    })
+
+    socket.on('updatedPaymentStatus',({status,orderId,userId})=>{
+      // console.log(status,orderId,userId)
+      const findUser = onlineUsers.find((user:any)=>user.userId === userId);
+      if(findUser){
+        // console.log('trigger')
+        io.to(findUser.socketId).emit('paymentStatusUpdated',{status,orderId})
       }
     })
 
